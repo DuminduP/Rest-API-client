@@ -1,2 +1,2 @@
-# rest-client
+# REST API Client
 Raw PHP REST API client project
