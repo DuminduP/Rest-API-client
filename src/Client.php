@@ -21,7 +21,7 @@ class Client
      * enable/disable debug mode
      * @var bool
      */
-    private const DEBUGING =  false;
+    private const DEBUGING = false;
     /**
      * Your email address
      * @var string
@@ -63,8 +63,8 @@ class Client
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
-        if(self::DEBUGING)  {
-            echo 'Response form the API '.self::TOKAN_URL."\n";
+        if (self::DEBUGING) {
+            echo 'Response form the API ' . self::TOKAN_URL . "\n";
             var_dump($result);
         }
 
@@ -73,7 +73,7 @@ class Client
         }
         $response = json_decode($result);
 
-        if(empty($response->data->sl_token))    {
+        if (empty($response->data->sl_token)) {
             throw new Exception('No token received from the API');
         }
         return $response->data->sl_token;
