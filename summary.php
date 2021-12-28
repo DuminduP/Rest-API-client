@@ -1,8 +1,14 @@
 <?php
+include_once 'bootstrap.php';
 
-use supermetrics\Client;
+use supermetrics\services\SupermetricsService;
 
-include 'src/Client.php';
+$email = 'sampathperera@hotmail.com';
+$name = 'Sampath';
+$numPages = 1; 
 
-$client = new Client('sampathperera@hotmail.com', 'Sampath');
+$supermetricsService = new SupermetricsService($email, $name, CLIENT_ID);
 
+$summary = $supermetricsService->getWeeklyMonthlySummary($numPages);
+
+echo json_encode($summary);
