@@ -64,7 +64,7 @@ class Aggregator
     {
         $out = [];
         foreach ($this->weekly as $week => $val) {
-            $out['weelly_stats'][] = [
+            $out['weekly_stats'][] = [
                 'week' => $week,
                 'total_posts' => $val['total_posts'],
             ];

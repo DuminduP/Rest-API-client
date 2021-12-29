@@ -3,6 +3,7 @@
 namespace supermetrics\lib;
 
 use Exception;
+use InvalidArgumentException;
 use supermetrics\exception\InvalidTokenException;
 
 /**
@@ -38,10 +39,13 @@ class SupermetricsClient
     /**
      * Token registered with the API
      */
-    private $token = 1;
+    private $token;
 
     public function __construct(string $email, string $name, $clientId)
     {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException($email . ' is not a valid email address');
+        }
         $this->email = $email;
         $this->name = $name;
         $this->clientId = $clientId;

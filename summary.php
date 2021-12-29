@@ -5,7 +5,7 @@ use supermetrics\services\SupermetricsService;
 
 $email = 'sampathperera@hotmail.com';
 $name = 'Sampath';
-$numPages = 1; 
+$numPages = 10;
 
 $supermetricsService = new SupermetricsService($email, $name, CLIENT_ID);
 
