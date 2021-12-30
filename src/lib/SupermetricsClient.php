@@ -2,6 +2,7 @@
 
 namespace supermetrics\lib;
 
+use DateTime;
 use Exception;
 use InvalidArgumentException;
 use supermetrics\exception\InvalidTokenException;
@@ -40,6 +41,10 @@ class SupermetricsClient
      * Token registered with the API
      */
     private $token;
+    /**
+     * Curl handlers
+     */
+    private $ch;
 
     public function __construct(string $email, string $name, $clientId)
     {
@@ -60,8 +65,8 @@ class SupermetricsClient
     }
 
     /**
-     * This function will handle all API calls
-     * If postData is not null, consider this as a post request. otherwise, its a get request
+     * This function will handle single API request
+     * If postData is not null, consider this as a POST request. otherwise, its a GET request
      */
     private function sendRequest(string $requestPath, array $params = [], array $postData = []): object
     {
@@ -75,16 +80,12 @@ class SupermetricsClient
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        if ($this->isLog) {
-            $this->log(self::API_BASE_URL . $requestPath);
-            if (!empty($postData)) {
-                $this->log('Post Data : ' . json_encode($postData));
-            }
+        $this->log(self::API_BASE_URL . $requestPath);
+        if (!empty($postData)) {
+            $this->log('Post Data : ' . json_encode($postData));
         }
         $result = curl_exec($ch);
-        if ($this->isLog) {
-            $this->log('Response : ' . $result);
-        }
+        $this->log('Response : ' . $result);
 
         if (empty($result)) {
             throw new Exception('No response from the API');
@@ -94,6 +95,68 @@ class SupermetricsClient
             throw new InvalidTokenException('Expired or Invalid SL Token');
         }
         return $response;
+    }
+
+    /**
+     * This function will handle setup CURL for multipal API calls simultaneously
+     * If postData is not null, consider this as a post request. otherwise, its a get request
+     */
+    private function setMultiRequest(string $requestPath, array $params = [], array $postData = []): void
+    {
+        $ch = curl_init();
+        if (!empty($params)) {
+            $requestPath .= '?' . http_build_query($params);
+        }
+        curl_setopt($ch, CURLOPT_URL, self::API_BASE_URL . $requestPath);
+        if (!empty($postData)) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $this->log(self::API_BASE_URL . $requestPath);
+        if (!empty($postData)) {
+            $this->log('Post Data : ' . json_encode($postData));
+        }
+        $this->ch[] = $ch;
+    }
+
+    protected function executeMultiRequest(): array
+    {
+        $retVal = [];
+        $mh = curl_multi_init();
+
+        foreach ($this->ch as $ch) {
+            curl_multi_add_handle($mh, $ch);
+        }
+        $active = null;
+        //execute the handles
+        do {
+            $mrc = curl_multi_exec($mh, $active);
+        } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+
+        while ($active && $mrc == CURLM_OK) {
+            if (curl_multi_select($mh) != -1) {
+                do {
+                    $mrc = curl_multi_exec($mh, $active);
+                } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+            }
+        }
+        foreach ($this->ch as $ch) {
+            $result = curl_multi_getcontent($ch); // get the content
+            curl_multi_remove_handle($mh, $ch);
+
+            $this->log('Response : ' . $result);
+
+            if (empty($result)) {
+                throw new Exception('No response from the API');
+            }
+            $response = json_decode($result);
+            if (!empty($response->error) && $response->error->message == 'Invalid SL Token') {
+                throw new InvalidTokenException('Expired or Invalid SL Token');
+            }
+            $retVal[] = $response;
+        }
+        return $retVal;
     }
 
     /**
@@ -113,10 +176,9 @@ class SupermetricsClient
     }
 
     /**
-     * Setup curl options and call the API
-     * If postData is not null, consider this as a post request. otherwise, its a get request
+     * Single API call
      */
-    protected function callAPI(string $requestPath, array $params = [], array $postData = []): object
+    protected function callApi(string $requestPath, array $params = [], array $postData = []): object
     {
         if ($this->token === null) {
             $this->refreshToken();
@@ -136,11 +198,28 @@ class SupermetricsClient
     }
 
     /**
+     * Setup curl options for multipal API calls
+     * If postData is not null, consider this as a POST request. otherwise, its a GET request
+     */
+    protected function setupApiCall(string $requestPath, array $params = [], array $postData = []): void
+    {
+        if ($this->token === null) {
+            $this->refreshToken();
+        }
+        $params['sl_token'] = $this->token;
+
+        $this->setMultiRequest($requestPath, $params, $postData);
+    }
+
+    /**
      * Write logfile
      */
     private function log(string $data): void
     {
-        file_put_contents($this->logFile, date("Y-m-d H:i:s - ") . $data . "\n", FILE_APPEND);
+        if ($this->isLog) {
+            $now = DateTime::createFromFormat('U.u', microtime(true));
+            file_put_contents($this->logFile, $now->format("Y-m-d H:i:s.v ") . $data . "\n", FILE_APPEND);
+        }
     }
 
 }

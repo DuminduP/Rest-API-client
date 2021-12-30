@@ -81,9 +81,9 @@ class Aggregator
         foreach ($this->monthly as $month => $val) {
             $out['monthly_stats'][] = [
                 'month' => $month,
-                'average_character_length_of_post' => $val['total_chars'] / $val['post_count'],
+                'average_character_length_of_post' => round(($val['total_chars'] / $val['post_count']),2),
                 'longest_post' => $val['longest_post'],
-                'average_number_of_posts_per_user' => $val['post_count'] / count($val['user_ids']),
+                'average_number_of_posts_per_user' => round(($val['post_count']/count($val['user_ids'])),2),
             ];
         }
         return $out;

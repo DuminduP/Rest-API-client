@@ -13,12 +13,12 @@ class SupermetricsService
     private $supermetricsApi;
     private $aggregator;
 
-    public function __construct(string $email, string $name, string $clientId)
+    public function __construct(string $email, string $name, string $clientId, $enableLog = false, $log_file_path = null)
     {
         $this->supermetricsApi = new SupermetricsApi($email, $name, $clientId);
         $this->aggregator = new Aggregator();
-        if (ENABLE_LOG) {
-            $this->supermetricsApi->enableLog(LOG_FILE_PATH);
+        if ($enableLog) {
+            $this->supermetricsApi->enableLog($log_file_path);
         }
     }
 
@@ -29,11 +29,10 @@ class SupermetricsService
      */
     public function getWeeklyMonthlySummary(int $numPages): array
     {
-        for ($i = 1; $i <= $numPages; $i++) {
-            $response = $this->supermetricsApi->fetchPost($i);
-
-            if (!empty($response->data->posts)) {
-                foreach ($response->data->posts as $post) {
+        $results = $this->supermetricsApi->fetchPosts($numPages);
+        foreach ($results as $res) {
+            if (!empty($res->data->posts)) {
+                foreach ($res->data->posts as $post) {
                     $this->aggregator->setData($post);
                 }
             }

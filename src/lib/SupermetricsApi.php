@@ -6,6 +6,7 @@ use \supermetrics\lib\SupermetricsClient;
 
 /**
  * Supermetrics API handler
+ * Create new methods for new API endpoints
  */
 class SupermetricsApi extends SupermetricsClient
 {
@@ -16,11 +17,23 @@ class SupermetricsApi extends SupermetricsClient
     }
 
     /**
-     * Fetch posts form the API
+     * Fetch one page form the API
      * @param int pageNumber
      */
     public function fetchPost(int $pageNumber): object
     {
-        return $this->callAPI('assignment/posts', ['page' => $pageNumber]);
+        return $this->callApi('assignment/posts', ['page' => $pageNumber]);
+    }
+
+    /**
+     * Fetch number of pages from the API
+     * @param int numberOfPages
+     */
+    public function fetchPosts(int $numberOfPages): array
+    {
+        for ($i = 1; $i <= $numberOfPages; $i++) {
+             $this->setupApiCall('assignment/posts', ['page' => $i]);
+        }
+        return $this->executeMultiRequest();
     }
 }
