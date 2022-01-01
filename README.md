@@ -20,9 +20,9 @@ I have used curl_multi that allows the processing of multiple cURL handles async
 
 # Installation
 
- 1. Clone or download the repository
+ 1. Clone or download this repository
  ```
- git clone https://github.com/DuminduP/rest-client.git
+ git clone https://github.com/DuminduP/Rest-API-client.git
  ```
  2. Change directory
  ```
