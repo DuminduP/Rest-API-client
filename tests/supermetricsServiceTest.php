@@ -33,7 +33,6 @@ class SupermetricsServiceTest extends TestCase
         $this->assertIsArray($rsp);
         $this->assertCount(2, $rsp);
         $this->assertArrayHasKey('monthly_stats', $rsp[0]);
-        $this->assertCount(2, $rsp[0]['monthly_stats']);
         $this->assertArrayHasKey('weekly_stats', $rsp[1]);
         $this->assertIsArray($rsp[0]['monthly_stats']);
         $this->assertIsArray($rsp[1]['weekly_stats']);
