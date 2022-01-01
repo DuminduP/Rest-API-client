@@ -5,7 +5,7 @@ Developed an object-oriented code, especially considering design thinking to be 
 other staff members while thinking about performance.
 
 No third party libraries were used on this project. Used PHP cURL to connect and communicate with the Supermetrics API.
-I have used curl_multi Athat allows the processing of multiple cURL handles asynchronously. I was able to reduce the run time by ~90% using curl_multi for concurrent requests for 10 pages.
+I have used curl_multi that allows the processing of multiple cURL handles asynchronously. I was able to reduce the run time by ~90% using curl_multi for concurrent requests for 10 pages.
 
 # Requirements
 
@@ -22,7 +22,7 @@ I have used curl_multi Athat allows the processing of multiple cURL handles asyn
 
  1. Clone or download the repository
  ```
- git clone git@github.com:DuminduP/rest-client.git
+ git clone https://github.com/DuminduP/rest-client.git
  ```
  2. Change directory
  ```
