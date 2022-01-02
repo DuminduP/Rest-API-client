@@ -36,7 +36,7 @@ sudo apt install phpunit
 ```
 phpunit
 ```
-5. Ren sample script to see the summary report.
+5. Run sample script to see the summary report.
 ```
 php summary.php
 ```
