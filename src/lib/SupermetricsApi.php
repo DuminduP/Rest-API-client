@@ -11,9 +11,9 @@ use \supermetrics\lib\SupermetricsClient;
 class SupermetricsApi extends SupermetricsClient
 {
 
-    public function __construct(string $email, string $name, $clientId)
+    public function __construct(string $email, string $name,string $clientId, string $apiBaseUrl = null)
     {
-       parent::__construct($email, $name, $clientId);
+       parent::__construct($email, $name, $clientId, $apiBaseUrl);
     }
 
     /**

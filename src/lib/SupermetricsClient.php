@@ -16,7 +16,7 @@ class SupermetricsClient
     /**
      * Supermetrics API base URL
      */
-    private const API_BASE_URL = 'https://api.supermetrics.com/';
+    private $apiBaseUrl = 'https://api.supermetrics.com/';
     /**
      * enable/disable log API requests/responses
      */
@@ -45,8 +45,19 @@ class SupermetricsClient
      * Curl handlers
      */
     private $ch;
+    /**
+     * Constructor.
+     *
+     * @param string $email  
+     * @param string $name
+     * @param string $clientId
+     * @param string $apiBaseUrl
+     *
+     * @throws InvalidArgumentException
+     * @throws \Exception
+     */
 
-    public function __construct(string $email, string $name, $clientId)
+    public function __construct(string $email, string $name,string $clientId, string $apiBaseUrl = null)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException($email . ' is not a valid email address');
@@ -54,6 +65,9 @@ class SupermetricsClient
         $this->email = $email;
         $this->name = $name;
         $this->clientId = $clientId;
+        if($apiBaseUrl !== null) {
+            $this->apiBaseUrl = $apiBaseUrl;
+        }
     }
 
     public function enableLog($log_file_path = null)
@@ -74,13 +88,13 @@ class SupermetricsClient
         if (!empty($params)) {
             $requestPath .= '?' . http_build_query($params);
         }
-        curl_setopt($ch, CURLOPT_URL, self::API_BASE_URL . $requestPath);
+        curl_setopt($ch, CURLOPT_URL, $this->apiBaseUrl . $requestPath);
         if (!empty($postData)) {
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $this->log(self::API_BASE_URL . $requestPath);
+        $this->log($this->apiBaseUrl . $requestPath);
         if (!empty($postData)) {
             $this->log('Post Data : ' . json_encode($postData));
         }
@@ -107,13 +121,13 @@ class SupermetricsClient
         if (!empty($params)) {
             $requestPath .= '?' . http_build_query($params);
         }
-        curl_setopt($ch, CURLOPT_URL, self::API_BASE_URL . $requestPath);
+        curl_setopt($ch, CURLOPT_URL, $this->apiBaseUrl . $requestPath);
         if (!empty($postData)) {
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $this->log(self::API_BASE_URL . $requestPath);
+        $this->log($this->apiBaseUrl. $requestPath);
         if (!empty($postData)) {
             $this->log('Post Data : ' . json_encode($postData));
         }

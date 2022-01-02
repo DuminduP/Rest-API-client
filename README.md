@@ -9,7 +9,7 @@ I have used curl_multi that allows the processing of multiple cURL handles async
 
 # Requirements
 
- *PHP 7.4 or higher needs to be installed.
+ * PHP 7.4 or higher needs to be installed.
   ```
  sudo apt-get install php
  ```
